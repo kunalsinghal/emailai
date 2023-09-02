@@ -5,80 +5,35 @@ import {
   ReconnectInterval,
 } from 'eventsource-parser';
 
-const createPrompt = (
-  inputLanguage: string,
-  outputLanguage: string,
-  inputCode: string,
-) => {
-  if (inputLanguage === 'Natural Language') {
-    return endent`
-    You are an expert programmer in all programming languages. Translate the natural language to "${outputLanguage}" code. Do not include \`\`\`.
+const createPrompt = (status: string, customerEmail: string) => {
+  return endent`
+    You are a delightful customer support agent. You're replying to a customer email based on the limited information from our internal email system.
 
-    Example translating from natural language to JavaScript:
+    We are a tax accounting company. Our customers are individuals or small business owners who need help with their taxes.
 
-    Natural language:
-    Print the numbers 0 to 9.
+    Customer email
+    --------------
+    ${customerEmail}
 
-    JavaScript code:
-    for (let i = 0; i < 10; i++) {
-      console.log(i);
-    }
+    Internal status for the customer
+    --------------
+    ${status}
 
-    Natural language:
-    ${inputCode}
+    Craft an appropriate reply to the customer email. The reply should be written in a friendly tone and should be grammatically correct. The reply should be written in English.
+    Always be informative and helpful. If there are any delays for the customer please be assuring.
 
-    ${outputLanguage} code (no \`\`\`):
+    Reply
+    --------------
     `;
-  } else if (outputLanguage === 'Natural Language') {
-    return endent`
-      You are an expert programmer in all programming languages. Translate the "${inputLanguage}" code to natural language in plain English that the average adult could understand. Respond as bullet points starting with -.
-  
-      Example translating from JavaScript to natural language:
-  
-      JavaScript code:
-      for (let i = 0; i < 10; i++) {
-        console.log(i);
-      }
-  
-      Natural language:
-      Print the numbers 0 to 9.
-      
-      ${inputLanguage} code:
-      ${inputCode}
-
-      Natural language:
-     `;
-  } else {
-    return endent`
-      You are an expert programmer in all programming languages. Translate the "${inputLanguage}" code to "${outputLanguage}" code. Do not include \`\`\`.
-  
-      Example translating from JavaScript to Python:
-  
-      JavaScript code:
-      for (let i = 0; i < 10; i++) {
-        console.log(i);
-      }
-  
-      Python code:
-      for i in range(10):
-        print(i)
-      
-      ${inputLanguage} code:
-      ${inputCode}
-
-      ${outputLanguage} code (no \`\`\`):
-     `;
-  }
 };
 
 export const OpenAIStream = async (
-  inputLanguage: string,
-  outputLanguage: string,
-  inputCode: string,
+  status: string,
+  customerEmail: string,
   model: string,
   key: string,
 ) => {
-  const prompt = createPrompt(inputLanguage, outputLanguage, inputCode);
+  const prompt = createPrompt(status, customerEmail);
 
   const system = { role: 'system', content: prompt };
 
@@ -91,7 +46,6 @@ export const OpenAIStream = async (
     body: JSON.stringify({
       model,
       messages: [system],
-      temperature: 0,
       stream: true,
     }),
   });

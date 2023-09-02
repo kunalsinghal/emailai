@@ -1,14 +1,12 @@
-import { CodeBlock } from '@/components/CodeBlock';
-import { LanguageSelect } from '@/components/LanguageSelect';
+import { DropDownSelect, statusOptions } from '@/components/DropDownSelect';
 import { ModelSelect } from '@/components/ModelSelect';
 import { TextBlock } from '@/components/TextBlock';
-import { OpenAIModel, TranslateBody } from '@/types/types';
+import { OpenAIModel, GenerateReplyBody } from '@/types/types';
 import Head from 'next/head';
-import { useEffect, useState } from 'react';
+import {  useState } from 'react';
 
 export default function Home() {
   const [inputLanguage, setInputLanguage] = useState<string>('JavaScript');
-  const [outputLanguage, setOutputLanguage] = useState<string>('Python');
   const [inputCode, setInputCode] = useState<string>('');
   const [outputCode, setOutputCode] = useState<string>('');
   const [model, setModel] = useState<OpenAIModel>('gpt-3.5-turbo');
@@ -17,11 +15,6 @@ export default function Home() {
 
   const handleTranslate = async () => {
     const maxCodeLength = model === 'gpt-3.5-turbo' ? 6000 : 12000;
-
-    if (inputLanguage === outputLanguage) {
-      alert('Please select different languages.');
-      return;
-    }
 
     if (!inputCode) {
       alert('Please enter some code.');
@@ -40,10 +33,9 @@ export default function Home() {
 
     const controller = new AbortController();
 
-    const body: TranslateBody = {
-      inputLanguage,
-      outputLanguage,
-      inputCode,
+    const body: GenerateReplyBody = {
+      status: inputLanguage,
+      customerEmail: inputCode,
       model,
     };
 
@@ -99,26 +91,21 @@ export default function Home() {
     document.body.removeChild(el);
   };
 
-  useEffect(() => {
-    if (hasTranslated) {
-      handleTranslate();
-    }
-  }, [outputLanguage]);
 
   return (
     <>
       <Head>
-        <title>Code Translator</title>
+        <title>Email Reply Generator</title>
         <meta
           name="description"
-          content="Use AI to translate code from one language to another."
+          content="Use AI to generate email replies for for a customer"
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="flex h-full min-h-screen flex-col items-center bg-[#0E1117] px-4 pb-20 text-neutral-200 sm:px-10">
         <div className="mt-10 flex flex-col items-center justify-center sm:mt-20">
-          <div className="text-4xl font-bold">AI Code Translator</div>
+          <div className="text-4xl font-bold">AI Email Reply Generator</div>
         </div>
 
         <div className="mt-2 flex items-center space-x-2">
@@ -129,13 +116,13 @@ export default function Home() {
             onClick={() => handleTranslate()}
             disabled={loading}
           >
-            {loading ? 'Translating...' : 'Translate'}
+            {loading ? 'Generating...' : 'Generate'}
           </button>
         </div>
 
         <div className="mt-2 text-center text-xs">
           {loading
-            ? 'Translating...'
+            ? 'Generating email...'
             : hasTranslated
             ? 'Output copied to clipboard!'
             : 'Enter some code and click "Translate"'}
@@ -143,9 +130,9 @@ export default function Home() {
 
         <div className="mt-6 flex w-full max-w-[1200px] flex-col justify-between sm:flex-row sm:space-x-4">
           <div className="h-100 flex flex-col justify-center space-y-2 sm:w-2/4">
-            <div className="text-center text-xl font-bold">Input</div>
+            <div className="text-center text-xl font-bold">Status and customer email</div>
 
-            <LanguageSelect
+            <DropDownSelect
               language={inputLanguage}
               onChange={(value) => {
                 setInputLanguage(value);
@@ -153,44 +140,21 @@ export default function Home() {
                 setInputCode('');
                 setOutputCode('');
               }}
+              options={statusOptions}
             />
 
-            {inputLanguage === 'Natural Language' ? (
-              <TextBlock
-                text={inputCode}
-                editable={!loading}
-                onChange={(value) => {
-                  setInputCode(value);
-                  setHasTranslated(false);
-                }}
-              />
-            ) : (
-              <CodeBlock
-                code={inputCode}
-                editable={!loading}
-                onChange={(value) => {
-                  setInputCode(value);
-                  setHasTranslated(false);
-                }}
-              />
-            )}
+            <TextBlock
+              text={inputCode}
+              editable={!loading}
+              onChange={(value) => {
+                setInputCode(value);
+                setHasTranslated(false);
+              }}
+            />
           </div>
           <div className="mt-8 flex h-full flex-col justify-center space-y-2 sm:mt-0 sm:w-2/4">
             <div className="text-center text-xl font-bold">Output</div>
-
-            <LanguageSelect
-              language={outputLanguage}
-              onChange={(value) => {
-                setOutputLanguage(value);
-                setOutputCode('');
-              }}
-            />
-
-            {outputLanguage === 'Natural Language' ? (
               <TextBlock text={outputCode} />
-            ) : (
-              <CodeBlock code={outputCode} />
-            )}
           </div>
         </div>
       </div>
