@@ -7,8 +7,13 @@ export const config = {
 
 const handler = async (req: Request): Promise<Response> => {
   try {
-    const { inputLanguage, outputLanguage, inputCode, model, apiKey } =
+    const { inputLanguage, outputLanguage, inputCode, model } =
       (await req.json()) as TranslateBody;
+
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (apiKey == null) {
+      throw new Error('openai api key missing');
+    }
 
     const stream = await OpenAIStream(
       inputLanguage,
