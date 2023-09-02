@@ -28,6 +28,7 @@ export const DropDownSelect: FC<Props> = ({ language, onChange, options }) => {
 };
 
 export const statusOptions = [
+  { value: 'No information available (new customer)', label: 'No information available (new customer)' },
   { value: 'In Progress', label: 'In Progress' },
   { value: 'Completed', label: 'Completed' },
   { value: 'Blocked on customer response', label: 'Blocked on customer response' },

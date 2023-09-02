@@ -137,8 +137,6 @@ export default function Home() {
               onChange={(value) => {
                 setInputLanguage(value);
                 setHasTranslated(false);
-                setInputCode('');
-                setOutputCode('');
               }}
               options={statusOptions}
             />
@@ -150,6 +148,7 @@ export default function Home() {
                 setInputCode(value);
                 setHasTranslated(false);
               }}
+              quickInserts
             />
           </div>
           <div className="mt-8 flex h-full flex-col justify-center space-y-2 sm:mt-0 sm:w-2/4">
