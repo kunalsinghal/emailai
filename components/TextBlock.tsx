@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface Props {
   text: string;
@@ -24,6 +24,12 @@ export const TextBlock: React.FC<Props> = ({
       onChange(randomMessages[randomIndex]);
     }
   };
+
+  useEffect(() => {
+    if (quickInserts && text === '') {
+      generateRandomText();
+    }
+  });
 
   // Handler for onChange event
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
